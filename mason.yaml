@@ -1,0 +1,9 @@
+bricks:
+  project:
+    git:
+      url: "https://github.com/yunusemre-senturk/mason-bricks"
+      path: ./bricks/project
+  page:
+    git:
+      url: "https://github.com/yunusemre-senturk/mason-bricks"
+      path: ./bricks/page
