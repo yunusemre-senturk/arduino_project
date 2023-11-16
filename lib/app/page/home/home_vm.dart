@@ -6,4 +6,10 @@ import 'package:injectable/injectable.dart';
 class HomeViewModel extends BaseViewModel {
   LocalDataSource localDataSource;
   HomeViewModel(this.localDataSource);
+  double _currentValue = 36;
+  double get currentValue => _currentValue;
+
+  setValue(double value) {
+    _currentValue = value;
+  }
 }
