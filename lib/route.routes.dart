@@ -9,11 +9,13 @@ import 'package:route_map/route_map.dart';
 import 'package:android_project/core/widget/media_viewer.dart';
 import 'package:android_project/core/widget/agreement.dart';
 import 'package:android_project/app/page/home/home.dart';
+import 'package:android_project/app/page/notification/notification.dart';
 
 class RouteMaps {
   static const String mediaViewerRoute = "/media_viewer_page";
   static const String agreementRoute = "/agreement_page";
   static const String homeRoute = "/home_page";
+  static const String notificationRoute = "/notification_page";
 }
 
 Map<String, RouteModel> get routes => _routes;
@@ -35,6 +37,9 @@ final Map<String, RouteModel> _routes = {
   ),
   RouteMaps.homeRoute: RouteModel(
     (_) => const HomePage(),
+  ),
+  RouteMaps.notificationRoute: RouteModel(
+    (_) => const NotificationPage(),
   ),
 };
 Route? $onGenerateRoute(RouteSettings routeSettings,
@@ -103,4 +108,9 @@ class AgreementRouteArgs {
 class HomeRoute extends BaseRoute {
   HomeRoute() : super(RouteMaps.homeRoute);
   static const String name = RouteMaps.homeRoute;
+}
+
+class NotificationRoute extends BaseRoute {
+  NotificationRoute() : super(RouteMaps.notificationRoute);
+  static const String name = RouteMaps.notificationRoute;
 }

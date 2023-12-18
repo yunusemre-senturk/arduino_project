@@ -8,10 +8,12 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:android_project/app/page/app/app_vm.dart' as _i8;
-import 'package:android_project/app/page/home/home_vm.dart' as _i10;
-import 'package:android_project/core/di/module.dart' as _i11;
-import 'package:android_project/core/source/encrypt_storage.dart' as _i9;
+import 'package:android_project/app/page/app/app_vm.dart' as _i9;
+import 'package:android_project/app/page/home/home_vm.dart' as _i11;
+import 'package:android_project/app/page/notification/notification_vm.dart'
+    as _i8;
+import 'package:android_project/core/di/module.dart' as _i12;
+import 'package:android_project/core/source/encrypt_storage.dart' as _i10;
 import 'package:android_project/core/source/local_data_source.dart' as _i6;
 import 'package:dio/dio.dart' as _i3;
 import 'package:firebase_core/firebase_core.dart' as _i4;
@@ -55,14 +57,16 @@ extension GetItInjectableX on _i1.GetIt {
       registerFor: {_test},
     );
     gh.factory<_i7.NetworkInfo>(() => appModule.networkInfo);
-    gh.lazySingleton<_i8.AppViewModel>(
-        () => _i8.AppViewModel(gh<_i6.LocalDataSource>()));
-    gh.lazySingleton<_i9.EncryptStorage>(
-        () => _i9.EncryptStorageImpl(gh<_i5.GetStorage>()));
-    gh.factory<_i10.HomeViewModel>(
-        () => _i10.HomeViewModel(gh<_i6.LocalDataSource>()));
+    gh.factory<_i8.NotificationViewModel>(
+        () => _i8.NotificationViewModel(gh<_i6.LocalDataSource>()));
+    gh.lazySingleton<_i9.AppViewModel>(
+        () => _i9.AppViewModel(gh<_i6.LocalDataSource>()));
+    gh.lazySingleton<_i10.EncryptStorage>(
+        () => _i10.EncryptStorageImpl(gh<_i5.GetStorage>()));
+    gh.factory<_i11.HomeViewModel>(
+        () => _i11.HomeViewModel(gh<_i6.LocalDataSource>()));
     gh.lazySingleton<_i6.LocalDataSource>(
-      () => _i6.LocalDataSourceImpl(gh<_i9.EncryptStorage>()),
+      () => _i6.LocalDataSourceImpl(gh<_i10.EncryptStorage>()),
       registerFor: {
         _prod,
         _dev,
@@ -72,4 +76,4 @@ extension GetItInjectableX on _i1.GetIt {
   }
 }
 
-class _$AppModule extends _i11.AppModule {}
+class _$AppModule extends _i12.AppModule {}

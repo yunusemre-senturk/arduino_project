@@ -1,11 +1,6 @@
-// Flutter imports:
 import 'package:flutter/material.dart';
-
-// Package imports:
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
-
-// Project imports:
 import 'package:android_project/app/page/app/app_vm.dart';
 import 'package:android_project/core/base/base_widget.dart';
 import 'package:android_project/core/res/theme.dart';
