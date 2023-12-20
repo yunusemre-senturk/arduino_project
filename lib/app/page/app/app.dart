@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:intl/intl.dart';
 import 'package:android_project/app/page/app/app_vm.dart';
 import 'package:android_project/core/base/base_widget.dart';
 import 'package:android_project/core/res/theme.dart';
@@ -23,16 +21,6 @@ class _MainAppState extends BaseState<AppViewModel, MainApp> {
       theme: AppTheme.theme(isDark: viewModel.isDark),
       initialRoute: RouteMaps.homeRoute,
       onGenerateRoute: onGenerateRoute,
-      locale: const Locale('tr'),
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      localeResolutionCallback: (
-        locale,
-        supportedLocales,
-      ) {
-        Intl.defaultLocale = locale?.languageCode;
-        return locale;
-      },
     );
   }
 }
