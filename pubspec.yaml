@@ -42,6 +42,7 @@ dependencies:
   route_map: ^0.0.17
   syncfusion_flutter_charts: ^23.2.7
   syncfusion_flutter_calendar: ^23.2.7
+  awesome_notifications: ^0.8.2
 
 dev_dependencies:
   build_runner: ^2.4.6
@@ -61,7 +62,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
-    
+
 flutter_native_splash:
   image: assets/app_icon.png
   color: "#ec6e01"

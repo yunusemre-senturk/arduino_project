@@ -1,11 +1,14 @@
+import 'package:android_project/app/data/model/notification_controller.dart';
 import 'package:android_project/core/res/colors.dart';
 import 'package:android_project/core/res/dimens.dart';
 import 'package:android_project/route.routes.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:route_map/route_map.dart';
 import 'package:android_project/core/base/base_widget.dart';
 import 'package:android_project/app/page/home/home_vm.dart';
 import 'package:data_table_2/data_table_2.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 
 @RouteMap()
 class HomePage extends StatefulWidget {
@@ -23,8 +26,10 @@ class _HomePageState extends BaseState<HomeViewModel, HomePage> {
           title: const Text("Hoşgeldiniz"),
           actions: [
             IconButton(
-                onPressed: () {
-                  NotificationRoute().push(context);
+                onPressed: () async {
+                  await NotificationService.showNotification(
+                      title: "Selamlar", body: "İlk bildirim");
+                  /* NotificationRoute().push(context); */
                 },
                 icon: const Icon(Icons.notifications))
           ],
@@ -53,6 +58,11 @@ class _HomePageState extends BaseState<HomeViewModel, HomePage> {
                           onChanged: (value) {
                             setState(() {
                               viewModel.setValue(value);
+                              if (viewModel.currentValue > 38) {
+                                NotificationService.showNotification(
+                                    title: "Çok sıcak çok sıcakk",
+                                    body: "Yanıyorum su getirr");
+                              }
                             });
                           },
                         ),
