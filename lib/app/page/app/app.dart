@@ -22,7 +22,7 @@ class _MainAppState extends BaseState<AppViewModel, MainApp> {
     return MaterialApp(
       navigatorKey: MainApp.navigatorKey,
       debugShowCheckedModeBanner: false,
-      title: "Sıcaklık ölçer",
+      title: "Tempeture",
       theme: AppTheme.theme(isDark: viewModel.isDark),
       initialRoute: RouteMaps.homeRoute,
       onGenerateRoute: onGenerateRoute,
