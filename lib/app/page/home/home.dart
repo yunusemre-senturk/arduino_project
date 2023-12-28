@@ -1,14 +1,12 @@
 import 'package:android_project/app/data/model/notification_controller.dart';
-import 'package:android_project/core/res/colors.dart';
+import 'package:android_project/app/data/model/tempeture/tempeture.dart';
 import 'package:android_project/core/res/dimens.dart';
-import 'package:android_project/route.routes.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:route_map/route_map.dart';
 import 'package:android_project/core/base/base_widget.dart';
 import 'package:android_project/app/page/home/home_vm.dart';
 import 'package:data_table_2/data_table_2.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
 
 @RouteMap()
 class HomePage extends StatefulWidget {
@@ -18,6 +16,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+//TODO Yapılacaklar .::.  Tarih set etmeyi ayarla ||  Bildirim kısmına bak || Derecenin doğruluğunu bul bir şekilde
+//TODO Yapılacaklar .::.  Lcd ekranı bağla || Sliderın renklerini gelen veriye göre güncelle || Verileri tek bir satıra değil alt alta eklemeyi öğren
 class _HomePageState extends BaseState<HomeViewModel, HomePage> {
   @override
   Widget build(BuildContext context) {
@@ -34,93 +34,116 @@ class _HomePageState extends BaseState<HomeViewModel, HomePage> {
                 icon: const Icon(Icons.notifications))
           ],
         ),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8),
-            child: Column(
-              children: [
-                Card(
+        body: StreamBuilder<DatabaseEvent>(
+            stream: FirebaseDatabase.instance.ref("Tempeture/value").onValue,
+            builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
+              if (snapshot.hasData && snapshot.data != null) {
+                Map<Object?, Object?> data =
+                    snapshot.data!.snapshot.value as Map<Object?, Object?>;
+                viewModel.setTemp(Tempeture(
+                    data['deviceuid'] as String,
+                    data['location'] as String,
+                    data['type'] as String,
+                    data['value'] as double));
+                viewModel.setDate();
+                return SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.all(Dimens.s),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 6.0, horizontal: 8),
                     child: Column(
                       children: [
-                        const SizedBox(height: Dimens.s),
-                        const Text(
-                          "En Son Ölçülen Sıcaklık",
-                          style: TextStyle(
-                              fontSize: Dimens.m, fontWeight: FontWeight.w600),
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(Dimens.s),
+                            child: Column(
+                              children: [
+                                const SizedBox(height: Dimens.s),
+                                const Text(
+                                  "En Son Ölçülen Sıcaklık",
+                                  style: TextStyle(
+                                      fontSize: Dimens.m,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                Slider(
+                                  divisions: 10,
+                                  max: 42,
+                                  min: 20,
+                                  value: viewModel.tempeture!.value!,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      viewModel.setValue(value);
+                                      if (viewModel.tempeture!.value! > 38) {
+                                        NotificationService.showNotification(
+                                            title: "Çok sıcak çok sıcakk",
+                                            body: "Yanıyorum su getirr");
+                                      }
+                                    });
+                                  },
+                                ),
+                                Divider(
+                                    color: getColorForTemperature(
+                                        viewModel.tempeture!.value!)),
+                                const SizedBox(
+                                  height: 8,
+                                ),
+                                Text(
+                                  "Vücut sıcaklığı: ${viewModel.tempeture!.value!}",
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                        Slider(
-                          divisions: 10,
-                          max: 42,
-                          min: 34,
-                          value: viewModel.currentValue,
-                          onChanged: (value) {
-                            setState(() {
-                              viewModel.setValue(value);
-                              if (viewModel.currentValue > 38) {
-                                NotificationService.showNotification(
-                                    title: "Çok sıcak çok sıcakk",
-                                    body: "Yanıyorum su getirr");
-                              }
-                            });
-                          },
-                        ),
-                        Divider(
-                            color:
-                                getColorForTemperature(viewModel.currentValue)),
-                        const SizedBox(
-                          height: 8,
-                        ),
-                        Text(
-                          "Vücut sıcaklığı: ${viewModel.currentValue}",
-                          style: const TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: Dimens.m),
-                Expanded(
-                  child: Card(
-                    child: Column(
-                      children: [
-                        const SizedBox(height: Dimens.s),
-                        const Text(
-                          "Ölçülen Sıcaklıklar",
-                          style: TextStyle(
-                              fontSize: Dimens.m, fontWeight: FontWeight.w600),
-                        ),
+                        const SizedBox(height: Dimens.m),
                         Expanded(
-                          child: DataTable2(columns: const [
-                            DataColumn(label: Text("Tarih")),
-                            DataColumn(label: Text("Sıcaklıklar")),
-                          ], rows: const [
-                            DataRow(cells: [
-                              DataCell(Text("02.08.2023")),
-                              DataCell(Text("38.7 °C")),
-                            ]),
-                            DataRow(cells: [
-                              DataCell(Text("10.09.2023")),
-                              DataCell(Text("35.7 °C")),
-                            ])
-                          ]),
-                        ),
+                          child: Card(
+                            child: Column(
+                              children: [
+                                const SizedBox(height: Dimens.s),
+                                const Text(
+                                  "Ölçülen Sıcaklıklar",
+                                  style: TextStyle(
+                                      fontSize: Dimens.m,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                Expanded(
+                                  child: DataTable2(columns: const [
+                                    DataColumn(label: Text("Tarih")),
+                                    DataColumn(label: Text("Sıcaklıklar")),
+                                  ], rows: [
+                                    DataRow(cells: [
+                                      const DataCell(Text("02.08.2023")),
+                                      DataCell(Text(
+                                          "${viewModel.tempeture?.value} °C")),
+                                    ]),
+                                    const DataRow(cells: [
+                                      DataCell(Text("10.09.2023")),
+                                      DataCell(Text("35.7 °C")),
+                                    ])
+                                  ]),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
                       ],
                     ),
                   ),
-                )
-              ],
-            ),
-          ),
-        ));
+                );
+              } else {
+                return const Center(
+                  child: Text("Loading"),
+                );
+              }
+            }));
   }
 }
 
 Color getColorForTemperature(double temperature) {
-  if (temperature >= 34 && temperature < 36) {
+  if (temperature >= 20 && temperature < 36) {
     // Mavi ile yeşil arasında geçiş
-    double normalizedTemperature = (temperature - 34) / (36 - 34);
+    double normalizedTemperature = (temperature - 20) / (36 - 20);
     return Color.lerp(Colors.blue, Colors.green, normalizedTemperature)!;
   } else if (temperature >= 36 && temperature < 38) {
     // Yeşil ile turuncu arasında geçiş
