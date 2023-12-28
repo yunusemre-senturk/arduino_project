@@ -49,7 +49,7 @@
 
 *ios build ipa*
 
-    flutter build ipa --flavor development --target lib/main_development.dart
+    flutter build ipa --flavor development --target lib/main.dart
 
     flutter build ipa --flavor staging --target lib/main_staging.dart
 
