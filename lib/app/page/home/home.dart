@@ -1,8 +1,10 @@
+import 'package:android_project/app/data/model/notification/notification.dart';
 import 'package:android_project/app/data/model/notification_controller.dart';
-import 'package:android_project/app/data/model/tempeture/tempeture.dart';
 import 'package:android_project/core/res/dimens.dart';
+import 'package:android_project/route.routes.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:route_map/route_map.dart';
 import 'package:android_project/core/base/base_widget.dart';
 import 'package:android_project/app/page/home/home_vm.dart';
@@ -17,7 +19,7 @@ class HomePage extends StatefulWidget {
 }
 
 //TODO Yapılacaklar .::.  Tarih set etmeyi ayarla ||  Bildirim kısmına bak || Derecenin doğruluğunu bul bir şekilde
-//TODO Yapılacaklar .::.  Lcd ekranı bağla || Sliderın renklerini gelen veriye göre güncelle || Verileri tek bir satıra değil alt alta eklemeyi öğren
+//TODO Yapılacaklar .::.  Display ekranı bağla || Sliderın renklerini gelen veriye göre güncelle
 class _HomePageState extends BaseState<HomeViewModel, HomePage> {
   @override
   Widget build(BuildContext context) {
@@ -26,110 +28,106 @@ class _HomePageState extends BaseState<HomeViewModel, HomePage> {
           title: const Text("Hoşgeldiniz"),
           actions: [
             IconButton(
-                onPressed: () async {
-                  await NotificationService.showNotification(
-                      title: "Selamlar", body: "İlk bildirim");
-                  /* NotificationRoute().push(context); */
+                onPressed: () {
+                  NotificationRoute().push(context);
                 },
                 icon: const Icon(Icons.notifications))
           ],
         ),
         body: StreamBuilder<DatabaseEvent>(
-            stream: FirebaseDatabase.instance.ref("Tempeture/value").onValue,
+            stream: FirebaseDatabase.instance.ref("Tempeture").onValue,
             builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
               if (snapshot.hasData && snapshot.data != null) {
-                Map<Object?, Object?> data =
-                    snapshot.data!.snapshot.value as Map<Object?, Object?>;
-                viewModel.setTemp(Tempeture(
-                    data['deviceuid'] as String,
-                    data['location'] as String,
-                    data['type'] as String,
-                    data['value'] as double));
-                viewModel.setDate();
+                Map<dynamic, dynamic> data =
+                    snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
+                viewModel.setTemp(data);
+                if (viewModel.tempeture.last.value! >= 37.5) {
+                  viewModel.setNotification(NotificationnModel(
+                      date: DateFormat("dd/MM/yyyy").format(DateTime.now()),
+                      subtitle: "Ateşi çıkmış olabilir",
+                      title:
+                          "Sıcaklık ${viewModel.tempeture.last.value}°C ' yi geçti"));
+                  NotificationService.showNotification(
+                      title: "Ateşi çıkmış olabilir",
+                      body:
+                          "Sıcaklık ${viewModel.tempeture.last.value}°C ' yi geçti");
+                }
+                //viewModel.setDate();
                 return SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 6.0, horizontal: 8),
-                    child: Column(
-                      children: [
-                        Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(Dimens.s),
-                            child: Column(
-                              children: [
-                                const SizedBox(height: Dimens.s),
-                                const Text(
-                                  "En Son Ölçülen Sıcaklık",
-                                  style: TextStyle(
-                                      fontSize: Dimens.m,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                                Slider(
-                                  divisions: 10,
-                                  max: 42,
-                                  min: 20,
-                                  value: viewModel.tempeture!.value!,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      viewModel.setValue(value);
-                                      if (viewModel.tempeture!.value! > 38) {
-                                        NotificationService.showNotification(
-                                            title: "Çok sıcak çok sıcakk",
-                                            body: "Yanıyorum su getirr");
-                                      }
-                                    });
-                                  },
-                                ),
-                                Divider(
-                                    color: getColorForTemperature(
-                                        viewModel.tempeture!.value!)),
-                                const SizedBox(
-                                  height: 8,
-                                ),
-                                Text(
-                                  "Vücut sıcaklığı: ${viewModel.tempeture!.value!}",
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500),
-                                ),
-                              ],
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 6.0, horizontal: 8),
+                      child: Column(
+                        children: [
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(Dimens.s),
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: Dimens.s),
+                                  const Text(
+                                    "En Son Ölçülen Sıcaklık",
+                                    style: TextStyle(
+                                        fontSize: Dimens.m,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  Slider(
+                                    divisions: 10,
+                                    max: 42,
+                                    min: 20,
+                                    value: viewModel.tempeture.last.value!,
+                                    onChanged: (value) {},
+                                  ),
+                                  Divider(
+                                      color: getColorForTemperature(
+                                          viewModel.tempeture.last.value!)),
+                                  const SizedBox(
+                                    height: 8,
+                                  ),
+                                  Text(
+                                    "Vücut sıcaklığı: ${viewModel.tempeture.last.value}°C",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: Dimens.m),
-                        Expanded(
-                          child: Card(
-                            child: Column(
-                              children: [
-                                const SizedBox(height: Dimens.s),
-                                const Text(
-                                  "Ölçülen Sıcaklıklar",
-                                  style: TextStyle(
-                                      fontSize: Dimens.m,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                                Expanded(
-                                  child: DataTable2(columns: const [
-                                    DataColumn(label: Text("Tarih")),
-                                    DataColumn(label: Text("Sıcaklıklar")),
-                                  ], rows: [
-                                    DataRow(cells: [
-                                      const DataCell(Text("02.08.2023")),
-                                      DataCell(Text(
-                                          "${viewModel.tempeture?.value} °C")),
-                                    ]),
-                                    const DataRow(cells: [
-                                      DataCell(Text("10.09.2023")),
-                                      DataCell(Text("35.7 °C")),
-                                    ])
-                                  ]),
-                                ),
-                              ],
+                          const SizedBox(height: Dimens.m),
+                          Expanded(
+                            child: Card(
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: Dimens.s),
+                                  const Text(
+                                    "Ölçülen Sıcaklıklar",
+                                    style: TextStyle(
+                                        fontSize: Dimens.m,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  Expanded(
+                                    child: DataTable2(
+                                        dividerThickness: 0.5,
+                                        columns: const [
+                                          DataColumn(label: Text("Tarih")),
+                                          DataColumn(
+                                              label: Text("Sıcaklıklar")),
+                                        ],
+                                        rows: viewModel.tempeture
+                                            .map((item) => DataRow2(cells: [
+                                                  DataCell(Text(
+                                                      item.date.toString())),
+                                                  DataCell(Text(
+                                                      "${item.value.toString()}°C"))
+                                                ]))
+                                            .toList()),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
+                          )
+                        ],
+                      )),
                 );
               } else {
                 return const Center(

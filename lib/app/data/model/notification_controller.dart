@@ -2,7 +2,6 @@ import 'package:android_project/app/page/app/app.dart';
 import 'package:android_project/app/page/notification/notification.dart';
 import 'package:android_project/core/res/colors.dart';
 import 'package:android_project/core/util/logger.dart';
-import 'package:android_project/route.routes.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 

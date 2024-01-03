@@ -11,7 +11,8 @@ Tempeture _$TempetureFromJson(Map<String, dynamic> json) => Tempeture(
       json['location'] as String?,
       json['type'] as String?,
       (json['value'] as num?)?.toDouble(),
-    )..date = json['date'] as String?;
+      json['date'] as String?,
+    );
 
 Map<String, dynamic> _$TempetureToJson(Tempeture instance) => <String, dynamic>{
       'deviceuid': instance.deviceuid,
