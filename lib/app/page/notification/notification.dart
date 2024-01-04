@@ -1,4 +1,5 @@
 import 'package:android_project/core/res/colors.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:route_map/route_map.dart';
 import 'package:android_project/core/base/base_widget.dart';
@@ -20,19 +21,42 @@ class _NotificationPageState
       appBar: AppBar(
         title: const Text("Bildirimler"),
       ),
-      body: ListView.builder(
-        itemBuilder: (context, index) {
-          return const Card(
-            child: ListTile(
-              leading: Icon(
-                Icons.whatshot,
-                color: AppColors.red,
-              ),
-              title: Text("En son gelen bildirim 38 derece"),
-            ),
-          );
-        },
-      ),
+      body: StreamBuilder<DatabaseEvent>(
+          stream: FirebaseDatabase.instance.ref("Notification").onValue,
+          builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
+            if (snapshot.hasData && snapshot.data != null) {
+              Map<dynamic, dynamic> data =
+                  snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
+              viewModel.setNotification(data);
+              return ListView.builder(
+                itemCount: viewModel.notification.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    child: ListTile(
+                      leading: const Icon(
+                        Icons.whatshot,
+                        color: AppColors.red,
+                      ),
+                      title: ListTile(
+                        title: Text(viewModel.notification[index].title),
+                        subtitle: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(viewModel.notification[index].subtitle),
+                            Text("Tarih: ${viewModel.notification[index].date}")
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            } else {
+              return const Center(
+                child: Text("Yükleniyor"),
+              );
+            }
+          }),
     );
   }
 }

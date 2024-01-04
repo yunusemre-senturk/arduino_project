@@ -1,10 +1,7 @@
-import 'package:android_project/app/data/model/notification/notification.dart';
-import 'package:android_project/app/data/model/notification_controller.dart';
 import 'package:android_project/core/res/dimens.dart';
 import 'package:android_project/route.routes.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:route_map/route_map.dart';
 import 'package:android_project/core/base/base_widget.dart';
 import 'package:android_project/app/page/home/home_vm.dart';
@@ -18,8 +15,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-//TODO Yapılacaklar .::.  Tarih set etmeyi ayarla ||  Bildirim kısmına bak || Derecenin doğruluğunu bul bir şekilde
-//TODO Yapılacaklar .::.  Display ekranı bağla || Sliderın renklerini gelen veriye göre güncelle
+//TODO Yapılacaklar .::.  Tarih set etmeyi ayarla ||   Derecenin doğruluğunu bul bir şekilde
+//TODO Yapılacaklar .::.  Display ekranı bağla
 class _HomePageState extends BaseState<HomeViewModel, HomePage> {
   @override
   Widget build(BuildContext context) {
@@ -41,16 +38,12 @@ class _HomePageState extends BaseState<HomeViewModel, HomePage> {
                 Map<dynamic, dynamic> data =
                     snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
                 viewModel.setTemp(data);
-                if (viewModel.tempeture.last.value! >= 37.5) {
-                  viewModel.setNotification(NotificationnModel(
-                      date: DateFormat("dd/MM/yyyy").format(DateTime.now()),
-                      subtitle: "Ateşi çıkmış olabilir",
-                      title:
-                          "Sıcaklık ${viewModel.tempeture.last.value}°C ' yi geçti"));
-                  NotificationService.showNotification(
-                      title: "Ateşi çıkmış olabilir",
-                      body:
-                          "Sıcaklık ${viewModel.tempeture.last.value}°C ' yi geçti");
+
+                if (viewModel.tempeture.any((element) =>
+                    element.value != viewModel.tempeture.last.value)) {
+                  if (viewModel.tempeture.last.value! >= 37.5) {
+                    viewModel.setNotification(viewModel.tempeture.last.value!);
+                  }
                 }
                 //viewModel.setDate();
                 return SafeArea(
