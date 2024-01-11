@@ -37,7 +37,8 @@ class HomeViewModel extends BaseViewModel {
           value['location'],
           value['type'],
           value["value"].toDouble(),
-          value["date"]);
+          DateFormat("dd.MM.yyyy").format(
+              DateTime.parse(value["date"].toString().substring(0, 10))));
 
       // Aynı özelliklere sahip bir öğe listeye eklenmemişse, ekleyin
       if (!_tempeture.any((element) =>
@@ -53,7 +54,8 @@ class HomeViewModel extends BaseViewModel {
     NotificationService.showNotification(
         title: "Ateşi çıkmış olabilir", body: "Sıcaklık $temp°C ' yi geçti");
     NotificationnModel notificationnModel = NotificationnModel(
-        date: DateFormat("dd/MM/yyyy").format(DateTime.now()),
+        date: DateFormat("dd.MM.yyyy").format(
+            DateTime.parse(tempeture.last.date.toString().substring(0, 10))),
         subtitle: "Ateşi çıkmış olabilir",
         title: "Sıcaklık $temp°C' yi geçti");
     _databaseReference = FirebaseDatabase.instance.ref().child("Notification");
@@ -63,25 +65,4 @@ class HomeViewModel extends BaseViewModel {
       Log.i(error.toString());
     });
   }
-  /* Future<void> setDate() async {
-    try {
-      // Ensure _tempeture is not null before updating its date
-      if (_tempeture != null) {
-        _tempeture!.date = DateFormat("dd/MM/yyyy").format(date);
-        await FirebaseDatabase.instance
-            .ref("Tempeture/value")
-            .update({"date": DateFormat("dd/MM/yyyy").format(date)});
-
-        // Update local _tempeture object's date
-
-        // Notify listeners about the change
-        notifyListeners();
-      } else {
-        Log.i('Tempeture object is null. Cannot update date.');
-      }
-    } catch (e) {
-      Log.e('Error updating date: $e');
-      // Handle the error as needed
-    }
-  }  */
 }

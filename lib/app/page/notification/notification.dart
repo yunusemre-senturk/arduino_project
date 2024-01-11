@@ -39,8 +39,8 @@ class _NotificationPageState
                       ),
                       title: ListTile(
                         title: Text(viewModel.notification[index].title),
-                        subtitle: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(viewModel.notification[index].subtitle),
                             Text("Tarih: ${viewModel.notification[index].date}")

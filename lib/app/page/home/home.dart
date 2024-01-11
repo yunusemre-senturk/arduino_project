@@ -108,8 +108,9 @@ class _HomePageState extends BaseState<HomeViewModel, HomePage> {
                                         ],
                                         rows: viewModel.tempeture
                                             .map((item) => DataRow2(cells: [
-                                                  DataCell(Text(
-                                                      item.date.toString())),
+                                                  DataCell(Text(item.date
+                                                      .toString()
+                                                      .substring(0, 10))),
                                                   DataCell(Text(
                                                       "${item.value.toString()}°C"))
                                                 ]))
